@@ -17,9 +17,66 @@ class Wonkie extends StatelessWidget {
           title: const Text('Wonkie'),
         ),
         body: Center(
-          child: Row(  ),
+          child: Column(children: [
+            Text(perguntas[0]),
+            Divider(),
+            Text("Sim"),
+            Row(
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 63, 63, 63),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 15,
+                    )),
+                    onPressed: () {},
+                    child: const Text('De Novo'),
+                  ),
+
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 63, 63, 63),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 15,
+                    )),
+                    onPressed: () {},
+                    child: const Text('Difícil'),
+                  ),
+                
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 63, 63, 63),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 15,
+                    )),
+                    onPressed: () {},
+                    child: const Text('Médio'),
+                ),
+
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 63, 63, 63),
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 15,
+                    )),
+                  onPressed: () {}, 
+                  child: const Text('Fácil'), 
+                ),
+                ]
+                ),
+              ],
+            )
+          ),
       ),
-    );
+      );
   }
 }
 
