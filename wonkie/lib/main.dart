@@ -14,14 +14,37 @@ class Wonkie extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Wonkie'),
+          title: const Text(
+            'Wonkie',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+            ),
         ),
         body: Center(
-          child: Column(children: [
-            Text(perguntas[0]),
+          child: Column(
+            children: [
+            Padding(
+              padding: EdgeInsets.all(20.0),
+              child: Transform.scale(
+                scale: 1.5,
+                child: Text(perguntas[0]),
+              ),
+            ),
+            // Text(perguntas[0]),
             Divider(),
-            Text("Sim"),
-            Row(
+            Padding(
+              padding: EdgeInsets.all(15.0),
+              child: Transform.scale(
+                scale: 1.2,
+                child: Text("Sim"),
+              ),
+            ),
+            Spacer(),
+            Padding(
+              padding: EdgeInsets.only(bottom: 40.0),
+              child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -72,6 +95,7 @@ class Wonkie extends StatelessWidget {
                 ),
                 ]
                 ),
+            ),
               ],
             )
           ),
