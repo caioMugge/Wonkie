@@ -24,23 +24,32 @@ class Wonkie extends StatelessWidget {
         body: Center(
           child: Column(
             children: [
-            Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Transform.scale(
-                scale: 1.5,
-                child: Text(perguntas[0]),
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                        child: Transform.scale(
+                          scale: 1.5,
+                          child: Text(perguntas[0]),
+                        ),
+                      ),   
+                    Divider(),
+                    Padding(
+                      padding: EdgeInsets.all(20.0),
+                      child: Transform.scale(
+                        scale: 1.2,
+                        child: Text("Sim"),
+                      ),
+                    ),   
+                  ],
+                ),
               ),
             ),
-            // Text(perguntas[0]),
-            Divider(),
-            Padding(
-              padding: EdgeInsets.all(15.0),
-              child: Transform.scale(
-                scale: 1.2,
-                child: Text("Sim"),
-              ),
-            ),
-            Spacer(),
+
+
             Padding(
               padding: EdgeInsets.only(bottom: 40.0),
               child: Row(
