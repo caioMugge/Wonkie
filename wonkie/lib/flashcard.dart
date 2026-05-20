@@ -101,18 +101,34 @@ class _FlashcardPageState
                         .spaceAround,
                 children: [
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 52, 52, 52), 
+                    foregroundColor: Colors.white,     
+                  ),
                     onPressed: () {},
                     child: const Text('De Novo'),
                   ),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 52, 52, 52), 
+                    foregroundColor: Colors.white,     
+                  ),
                     onPressed: () {},
                     child: const Text('Difícil'),
                   ),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 52, 52, 52), 
+                    foregroundColor: Colors.white,     
+                  ),
                     onPressed: () {},
                     child: const Text('Médio'),
                   ),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 52, 52, 52), 
+                    foregroundColor: Colors.white,     
+                  ),
                     onPressed: () {},
                     child: const Text('Fácil'),
                   ),
