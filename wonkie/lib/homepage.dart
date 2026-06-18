@@ -38,6 +38,8 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
 
+
+    // onde serao mostrados os baralhos
       body: baralhos.isEmpty
           ? const Center(
               child: Text(
@@ -46,29 +48,24 @@ class _HomePageState extends State<HomePage> {
               ),
             )
 
+    // se tiver algum barulho criado
           : ListView.builder(
               itemCount: baralhos.length,
 
               itemBuilder: (context, index) {
 
                 final baralho = baralhos[index];
-
                 return Card(
                   margin: const EdgeInsets.all(10),
-
                   child: ListTile(
-
                     title: Text(
                       baralho.nome,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-
                     subtitle: Text(baralho.pergunta),
-
                     onTap: () {
-
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -79,12 +76,9 @@ class _HomePageState extends State<HomePage> {
                         ),
                       );
                     },
-
                     trailing: IconButton(
                       icon: const Icon(Icons.delete),
-
                       onPressed: () {
-
                         setState(() {
                           baralhos.removeAt(index);
                         });
@@ -94,7 +88,9 @@ class _HomePageState extends State<HomePage> {
                 );
               },
             ),
+            
 
+      // botao para criar novo barahlo
       floatingActionButton: FloatingActionButton(
         backgroundColor:
             const Color.fromARGB(255, 63, 63, 63),
@@ -126,6 +122,8 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
+
+
 class CriarBaralhoPage extends StatefulWidget {
   const CriarBaralhoPage({super.key});
 
@@ -155,66 +153,50 @@ class _CriarBaralhoPageState
         title: const Text('Criar Baralho'),
       ),
 
+      // card onde terao as perguntas do baralho
       body: Padding(
         padding: const EdgeInsets.all(20),
-
         child: Column(
           children: [
-
             TextField(
               controller: nomeController,
-
               decoration: const InputDecoration(
                 labelText: 'Nome do Baralho',
                 border: OutlineInputBorder(),
               ),
             ),
-
             const SizedBox(height: 20),
-
             TextField(
               controller: perguntaController,
-
               decoration: const InputDecoration(
                 labelText: 'Pergunta',
                 border: OutlineInputBorder(),
               ),
             ),
-
             const SizedBox(height: 20),
-
             TextField(
               controller: respostaController,
-
               decoration: const InputDecoration(
                 labelText: 'Resposta',
                 border: OutlineInputBorder(),
               ),
             ),
-
             const SizedBox(height: 30),
-
             ElevatedButton(
-
               style: ElevatedButton.styleFrom(
                 backgroundColor:
                     const Color.fromARGB(
                         255, 63, 63, 63),
-
                 foregroundColor: Colors.white,
               ),
-
               onPressed: () {
-
                 final baralho = Baralho(
                   nome: nomeController.text,
                   pergunta: perguntaController.text,
                   resposta: respostaController.text,
                 );
-
                 Navigator.pop(context, baralho);
               },
-
               child: const Text('Salvar'),
             ),
           ],

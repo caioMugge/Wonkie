@@ -35,6 +35,7 @@ class _FlashcardPageState
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    //  onde fica a pergunta
                     Padding(
                       padding:
                           const EdgeInsets.all(20),
@@ -47,6 +48,8 @@ class _FlashcardPageState
                         ),
                       ),
                     ),
+                    
+                    // onde fica a resposta
                     const Divider(),
                     if (mostrarResposta)
                       Padding(
@@ -91,6 +94,8 @@ class _FlashcardPageState
                 ),
               ),
             ),
+
+            // botoes de nivel
             Padding(
               padding:
                   const EdgeInsets.only(
