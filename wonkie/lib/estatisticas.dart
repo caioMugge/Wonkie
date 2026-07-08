@@ -67,7 +67,6 @@ class EstatisticasPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // --- ANIMAÇÃO EXCLUSIVA (Gráfico de barras animado via Tween) ---
             Card(
               // padding: const EdgeInsets.all(20),
               child: Column(
@@ -110,7 +109,6 @@ class EstatisticasPage extends StatelessWidget {
     );
   }
 
-  // Widget que renderiza a barra com animação implícita controlada por tempo
   Widget _buildAnimatedBar(String rotulo, double porcentagem, Color cor) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

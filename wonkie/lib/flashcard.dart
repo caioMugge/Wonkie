@@ -15,11 +15,9 @@ class _FlashcardPageState extends State<FlashcardPage> {
   bool mostrarResposta = false;
   String infoCalculo = '';
 
-  // Algoritmo de Processamento de Repetição Espaçada (SM2 Simplificado)
   void _processarResposta(int qualidade) {
     final card = widget.baralho.cards[indiceAtual];
 
-    // Qualidade: 1 = De novo, 2 = Difícil, 3 = Médio, 4 = Fácil
     if (qualidade >= 2) {
       if (card.repeticoes == 0) {
         card.intervaloDias = 1;
@@ -31,10 +29,9 @@ class _FlashcardPageState extends State<FlashcardPage> {
       card.repeticoes++;
     } else {
       card.repeticoes = 0;
-      card.intervaloDias = 0; // Precisa rever imediatamente (em minutos)
+      card.intervaloDias = 0; 
     }
 
-    // Ajusta o fator de facilidade baseado no feedback do usuário
     card.fatorFacilidade = card.fatorFacilidade + (0.1 - (5 - qualidade) * (0.08 + (5 - qualidade) * 0.02));
     if (card.fatorFacilidade < 1.3) card.fatorFacilidade = 1.3;
 
@@ -48,7 +45,6 @@ class _FlashcardPageState extends State<FlashcardPage> {
       SnackBar(content: Text(infoCalculo), duration: const Duration(seconds: 2)),
     );
 
-    // Avança para o próximo card do baralho se houver
     Future.delayed(const Duration(milliseconds: 1500), () {
       if (mounted) {
         setState(() {
@@ -78,16 +74,14 @@ class _FlashcardPageState extends State<FlashcardPage> {
           children: [
             Expanded(
               child: Center(
-                // ANIMAÇÃO DE ROTAÇÃO 3D (Diferente do apresentado tradicionalmente em aula)
                 child: TweenAnimationBuilder(
                   duration: const Duration(milliseconds: 600),
                   tween: Tween<double>(begin: 0, end: mostrarResposta ? pi : 0),
                   builder: (context, double valorAngulo, child) {
-                    // Controla qual lado do card renderizar no meio da rotação
                     final bool estaNoVerso = valorAngulo >= pi / 2;
                     return Transform(
                       transform: Matrix4.identity()
-                        ..setEntry(3, 2, 0.001) // Efeito de perspectiva de profundidade
+                        ..setEntry(3, 2, 0.001) 
                         ..rotateY(valorAngulo),
                       alignment: Alignment.center,
                       child: Card(
@@ -98,7 +92,6 @@ class _FlashcardPageState extends State<FlashcardPage> {
                           height: 220,
                           alignment: Alignment.center,
                           padding: const EdgeInsets.all(20),
-                          // Inverte o texto se estiver no verso para não ficar espelhado
                           child: Transform(
                             alignment: Alignment.center,
                             transform: estaNoVerso ? Matrix4.rotationY(pi) : Matrix4.identity(),
@@ -122,7 +115,6 @@ class _FlashcardPageState extends State<FlashcardPage> {
               child: Text(mostrarResposta ? 'Ver Pergunta' : 'Mostrar Resposta'),
             ),
             const SizedBox(height: 30),
-            // Botões que desencadeiam os cálculos matemáticos
             Padding(
               padding: const EdgeInsets.only(bottom: 40),
               child: Row(
@@ -147,7 +139,7 @@ class _FlashcardPageState extends State<FlashcardPage> {
         backgroundColor: cor,
         foregroundColor: Colors.white,
       ),
-      onPressed: mostrarResposta ? acao : null, // Só habilita após ver a resposta
+      onPressed: mostrarResposta ? acao : null, 
       child: Text(texto),
     );
   }

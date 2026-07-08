@@ -204,7 +204,6 @@ class _CriarBaralhoPageState extends State<CriarBaralhoPage> {
   }
 }
 
-// NOVA TELA 1: ESTATÍSTICAS DO APP (Exemplo de StatelessWidget e Processamento)
 class EstatisticasPage extends StatelessWidget {
   final List<Baralho> baralhos;
 
