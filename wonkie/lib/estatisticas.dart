@@ -118,7 +118,7 @@ class EstatisticasPage extends StatelessWidget {
         TweenAnimationBuilder<double>(
           tween: Tween<double>(begin: 0.0, end: porcentagem),
           duration: const Duration(milliseconds: 1200),
-          curve: Curves.easeOutBack, // Curva de animação estilizada com leve efeito elástico
+          curve: Curves.easeOutBack,
           builder: (context, value, child) {
             return Stack(
               children: [
