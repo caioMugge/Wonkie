@@ -37,7 +37,7 @@ class DatabaseHelper {
     ''');
 
     await db.execute('''
-      CREATE TABLE flashcard (
+      CREATE TABLE flashcards (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         baralho_id INTEGER NOT NULL,
         pergunta TEXT NOT NULL,
@@ -70,7 +70,7 @@ class DatabaseHelper {
     for (var bMap in resultBaralhos) {
       final baralhoId = bMap['id'] as int;
       final resultCards = await db.query(
-        'flascards',
+        'flashcards',
         where: 'baralho_id = ?',
         whereArgs: [baralhoId],
       );

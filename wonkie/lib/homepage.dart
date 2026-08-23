@@ -1,33 +1,61 @@
 import 'package:flutter/material.dart';
+import 'banco.dart';
+import 'shared_preferences.dart';
 import 'flashcard.dart';
 import 'gerenciar_card.dart';
+import 'estatisticas.dart';
+import 'main.dart';
 
-// Modelo do Flashcard com variáveis para cálculos
 class Flashcard {
+  int? id;
+  int? baralhoId;
   String pergunta;
   String resposta;
-  int repeticoes; // Quantas vezes foi revisado sucessivamente
-  double fatorFacilidade; // Fator SM2 (padrão 2.5)
-  int intervaloDias; // Dias até a próxima revisão
+  int repeticoes;
+  double fatorFacilidade;
+  int intervaloDias;
 
   Flashcard({
+    this.id,
+    this.baralhoId,
     required this.pergunta,
     required this.resposta,
     this.repeticoes = 0,
     this.fatorFacilidade = 2.5,
     this.intervaloDias = 0,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'baralho_id': baralhoId,
+      'pergunta': pergunta,
+      'resposta': resposta,
+      'repeticoes': repeticoes,
+      'fatorFacilidade': fatorFacilidade,
+      'intervaloDias': intervaloDias,
+    };
+  }
+
+  factory Flashcard.fromMap(Map<String, dynamic> map) {
+    return Flashcard(
+      id: map['id'],
+      baralhoId: map['baralho_id'],
+      pergunta: map['pergunta'],
+      resposta: map['resposta'],
+      repeticoes: map['repeticoes'],
+      fatorFacilidade: map['fatorFacilidade'],
+      intervaloDias: map['intervaloDias'],
+    );
+  }
 }
 
-// Modelo do Baralho que agora possui múltiplos cards
 class Baralho {
+  int? id;
   String nome;
   List<Flashcard> cards;
 
-  Baralho({
-    required this.nome,
-    required this.cards,
-  });
+  Baralho({this.id, required this.nome, required this.cards});
 }
 
 class HomePage extends StatefulWidget {
@@ -39,37 +67,87 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Baralho> baralhos = [];
+  String ultimoEstudoStr = 'Carregando...';
+  bool carregando = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _carregarDados();
+  }
+
+  Future<void> _carregarDados() async {
+    final list = await DatabaseHelper.instance.getBaralhosComCards();
+    final prefData = await PreferencesService.getUltimoEstudo();
+    setState(() {
+      baralhos = list;
+      ultimoEstudoStr = prefData;
+      carregando = false;
+    });
+  }
+
+  Future<void> _alternarTema() async {
+    final novoValor = !temaEscuroNotifier.value;
+    temaEscuroNotifier.value = novoValor;
+    await PreferencesService.salvarTema(novoValor);
+  }
+
+  Future<void> _editarBaralho(Baralho baralho) async {
+    final nomeEditController = TextEditingController(text: baralho.nome);
+
+    final confirmou = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Editar Baralho'),
+        content: TextField(
+          controller: nomeEditController,
+          autofocus: true,
+          decoration: const InputDecoration(labelText: 'Nome do Baralho'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Salvar'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmou == true && nomeEditController.text.isNotEmpty) {
+      await DatabaseHelper.instance
+          .updateBaralho(baralho.id!, nomeEditController.text);
+      _carregarDados();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Baralho atualizado!')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
-      // COMENTADO
-      // appBar: AppBar(
-      //   title: const Text('Wonkie Flashcards', style: TextStyle(fontWeight: FontWeight.bold)),
-      //   actions: [
-      //     IconButton(
-      //       icon: const Icon(Icons.bar_chart),
-      //       tooltip: 'Estatísticas',
-      //       onPressed: () {
-      //         Navigator.push(
-      //           context,
-      //           MaterialPageRoute(builder: (context) => EstatisticasPage(baralhos: baralhos)),
-      //         );
-      //       },
-      //     )
-      //   ],
-      // ),
       appBar: AppBar(
-        title: const Text(
-          'Wonkie',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: const Text('Wonkie Flashcards',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.bar_chart_rounded),
+            icon: Icon(
+              temaEscuroNotifier.value ? Icons.light_mode : Icons.dark_mode,
+            ),
+            tooltip: 'Alternar tema',
+            onPressed: () {
+              setState(_alternarTema);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.bar_chart),
             tooltip: 'Ver Estatísticas',
             onPressed: () {
               Navigator.push(
@@ -79,66 +157,99 @@ class _HomePageState extends State<HomePage> {
                 ),
               );
             },
-          ),
+          )
         ],
       ),
-      body: baralhos.isEmpty
-          ? const Center(
-              child: Text(
-                'Nenhum baralho criado ainda.',
-                style: TextStyle(fontSize: 18, color: Colors.grey),
-              ),
-            )
-          : ListView.builder(
-              itemCount: baralhos.length,
-              itemBuilder: (context, index) {
-                final baralho = baralhos[index];
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                  child: Card(
-                    child: ListTile(
-                      title: Text(baralho.nome, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                      subtitle: Text('${baralho.cards.length} flashcards adicionados'),
-                      onTap: () {
-                        if (baralho.cards.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Adicione perguntas ao baralho antes de estudar!')),
-                          );
-                          return;
-                        }
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => FlashcardPage(baralho: baralho)),
-                        );
-                      },
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.add_to_photos, color: Colors.blueGrey),
-                            onPressed: () async {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => GerenciarCardsPage(baralho: baralho)),
-                              );
-                              setState(() {});
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.redAccent),
-                            onPressed: () {
-                              setState(() {
-                                baralhos.removeAt(index);
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
+      body: carregando
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  color: Colors.black.withOpacity(0.25),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.history, color: Color(0xFF1ABC9C)),
+                      const SizedBox(width: 8),
+                      Text('Última sessão de estudo: $ultimoEstudoStr',
+                          style: const TextStyle(fontSize: 13)),
+                    ],
                   ),
-                );
-              },
+                ),
+                Expanded(
+                  child: baralhos.isEmpty
+                      ? const Center(
+                          child: Text('Nenhum baralho criado.'),
+                        )
+                      : ListView.builder(
+                          itemCount: baralhos.length,
+                          itemBuilder: (context, index) {
+                            final baralho = baralhos[index];
+                            return Card(
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 15, vertical: 8),
+                              child: ListTile(
+                                title: Text(
+                                  baralho.nome,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                subtitle:
+                                    Text('${baralho.cards.length} cards cadastrados'),
+                                onTap: () async {
+                                  if (baralho.cards.isEmpty) return;
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          FlashcardPage(baralho: baralho),
+                                    ),
+                                  );
+                                  _carregarDados();
+                                },
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.edit,
+                                          color: Colors.orange),
+                                      tooltip: 'Editar nome',
+                                      onPressed: () => _editarBaralho(baralho),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.add_to_photos,
+                                          color: Colors.blue),
+                                      tooltip: 'Gerenciar cards',
+                                      onPressed: () async {
+                                        await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                GerenciarCardsPage(
+                                                    baralho: baralho),
+                                          ),
+                                        );
+                                        _carregarDados();
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete,
+                                          color: Colors.redAccent),
+                                      tooltip: 'Excluir baralho',
+                                      onPressed: () async {
+                                        await DatabaseHelper.instance
+                                            .deleteBaralho(baralho.id!);
+                                        _carregarDados();
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                ),
+              ],
             ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
@@ -148,9 +259,8 @@ class _HomePageState extends State<HomePage> {
             MaterialPageRoute(builder: (context) => const CriarBaralhoPage()),
           );
           if (novoBaralho != null) {
-            setState(() {
-              baralhos.add(novoBaralho);
-            });
+            await DatabaseHelper.instance.insertBaralho(novoBaralho.nome);
+            _carregarDados();
           }
         },
       ),
@@ -158,7 +268,6 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-// TELA DE CRIAÇÃO DO BARALHO (Apenas Nome)
 class CriarBaralhoPage extends StatefulWidget {
   const CriarBaralhoPage({super.key});
 
@@ -184,73 +293,21 @@ class _CriarBaralhoPageState extends State<CriarBaralhoPage> {
                 border: OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
               ),
               onPressed: () {
                 if (nomeController.text.isNotEmpty) {
-                  final baralho = Baralho(nome: nomeController.text, cards: []);
-                  Navigator.pop(context, baralho);
+                  Navigator.pop(
+                      context, Baralho(nome: nomeController.text, cards: []));
                 }
               },
-              child: const Text('Criar e Avançar'),
+              child: const Text('Salvar'),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class EstatisticasPage extends StatelessWidget {
-  final List<Baralho> baralhos;
-
-  const EstatisticasPage({super.key, required this.baralhos});
-
-  @override
-  Widget build(BuildContext context) {
-    int totalDeCards = 0;
-    int totalRevisados = 0;
-    double somaFacilidade = 0.0;
-
-    for (var b in baralhos) {
-      totalDeCards += b.cards.length;
-      for (var card in b.cards) {
-        if (card.repeticoes > 0) totalRevisados++;
-        somaFacilidade += card.fatorFacilidade;
-      }
-    }
-
-    double mediaFacilidade = totalDeCards > 0 ? (somaFacilidade / totalDeCards) : 0.0;
-
-    return Scaffold(
-      appBar: AppBar(title: const Text('Dashboard e Estatísticas')),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Visão Geral do Seu Aprendizado:', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
-            _buildStatCard('Total de Baralhos', '${baralhos.length}', Colors.blue),
-            _buildStatCard('Total de Flashcards', '$totalDeCards', Colors.teal),
-            _buildStatCard('Cards Já Revisados', '$totalRevisados', Colors.orange),
-            _buildStatCard('Fator de Facilidade Médio', mediaFacilidade.toStringAsFixed(2), Colors.purple),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatCard(String titulo, String valor, Color cor) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: ListTile(
-        leading: CircleAvatar(backgroundColor: cor, child: const Icon(Icons.analytics, color: Colors.white)),
-        title: Text(titulo),
-        trailing: Text(valor, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
       ),
     );
   }

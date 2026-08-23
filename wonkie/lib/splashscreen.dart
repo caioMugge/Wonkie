@@ -47,26 +47,10 @@ class _SplashScreenState extends State<SplashScreen> {
               },
               child: Image.asset(
                 'assets/logo.png',
-                width: 360,
-                height: 360,
+                width: 560,
+                height: 560,
               ),
             ),
-            const SizedBox(height: 20),
-            const Text(
-              'WONKIE',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 4,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              'Flashcards & Repetição Espaçada',
-              style: TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 40),
             const CircularProgressIndicator(color: Color(0xFF1ABC9C)),
           ],
         ),

@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'homepage.dart';
 
@@ -21,20 +20,21 @@ class EstatisticasPage extends StatelessWidget {
         somaFacilidade += card.fatorFacilidade;
         if (card.repeticoes > 0) {
           cardsRevisados++;
-        }else {
+        } else {
           cardsNovos++;
         }
       }
     }
 
     double mediaFacilidade = totalDeCards > 0 ? (somaFacilidade / totalDeCards) : 2.5;
-
     double pctRevisados = totalDeCards > 0 ? (cardsRevisados / totalDeCards) : 0.0;
     double pctNovos = totalDeCards > 0 ? (cardsNovos / totalDeCards) : 0.0;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Estatísticas de Estudo', style: TextStyle(fontWeight: FontWeight.bold)
+        title: const Text(
+          'Estatísticas de Estudo',
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: SingleChildScrollView(
@@ -42,10 +42,11 @@ class EstatisticasPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Resumo Geral', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+            const Text(
+              'Resumo Geral',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
             ),
             const SizedBox(height: 15),
-
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
@@ -55,31 +56,25 @@ class EstatisticasPage extends StatelessWidget {
               childAspectRatio: 1.4,
               children: [
                 _buildStatCard('Baralhos', '$totalDeBaralhos', Colors.blueAccent),
-                 _buildStatCard('Total Cards', '$totalDeCards', Colors.teal),
+                _buildStatCard('Total Cards', '$totalDeCards', Colors.teal),
                 _buildStatCard('Revisados', '$cardsRevisados', Colors.green),
                 _buildStatCard('Fator EF Médio', mediaFacilidade.toStringAsFixed(2), Colors.purpleAccent),
               ],
             ),
-             const SizedBox(height: 35),
+            const SizedBox(height: 35),
             const Text(
               'Progresso de Memorização',
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
             ),
             const SizedBox(height: 20),
-
             Card(
-              // padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('Proporção de Cartões', style: TextStyle(fontSize: 16, color: Colors.grey)),
                   const SizedBox(height: 20),
-                  
-                  // Barra de Cards Revisados
                   _buildAnimatedBar('Revisados ($cardsRevisados)', pctRevisados, Colors.green),
                   const SizedBox(height: 15),
-                  
-                  // Barra de Cards Novos
                   _buildAnimatedBar('Novos / Não Estudados ($cardsNovos)', pctNovos, Colors.orangeAccent),
                 ],
               ),
@@ -89,6 +84,7 @@ class EstatisticasPage extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildStatCard(String titulo, String valor, Color cor) {
     return Card(
       child: Padding(
@@ -118,7 +114,7 @@ class EstatisticasPage extends StatelessWidget {
         TweenAnimationBuilder<double>(
           tween: Tween<double>(begin: 0.0, end: porcentagem),
           duration: const Duration(milliseconds: 1200),
-          curve: Curves.easeOutBack,
+          curve: Curves.easeOutBack, 
           builder: (context, value, child) {
             return Stack(
               children: [
@@ -131,7 +127,7 @@ class EstatisticasPage extends StatelessWidget {
                   ),
                 ),
                 FractionallySizedBox(
-                  widthFactor: value > 0 ? value : 0.01, // Evita bug visual se for 0
+                  widthFactor: value > 0 ? value : 0.01,
                   child: Container(
                     height: 15,
                     decoration: BoxDecoration(
