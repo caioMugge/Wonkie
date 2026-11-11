@@ -5,7 +5,9 @@ import 'flashcard.dart';
 import 'gerenciar_card.dart';
 import 'estatisticas.dart';
 import 'main.dart';
+import 'frase_service.dart'; 
 
+// MUDOU
 class Flashcard {
   int? id;
   int? baralhoId;
@@ -65,15 +67,20 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+//  MUDOU
 class _HomePageState extends State<HomePage> {
   List<Baralho> baralhos = [];
   String ultimoEstudoStr = 'Carregando...';
   bool carregando = true;
 
+  Frase? frase;
+  bool carregandoFrase = true;
+
   @override
   void initState() {
     super.initState();
     _carregarDados();
+    _carregarFrase(); // NOVO: chamada uma única vez ao abrir a tela
   }
 
   Future<void> _carregarDados() async {
@@ -83,6 +90,16 @@ class _HomePageState extends State<HomePage> {
       baralhos = list;
       ultimoEstudoStr = prefData;
       carregando = false;
+    });
+  }
+
+   Future<void> _carregarFrase() async {
+    setState(() => carregandoFrase = true);
+    final f = await FraseService.buscarFrase();
+    if (!mounted) return;
+    setState(() {
+      frase = f;
+      carregandoFrase = false;
     });
   }
 
@@ -164,6 +181,53 @@ class _HomePageState extends State<HomePage> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
+
+                Card(
+                  margin: const EdgeInsets.fromLTRB(15, 12, 15, 4),
+                  child: Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.format_quote,
+                            color: Color(0xFF1ABC9C), size: 32),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: carregandoFrase
+                              ? const Text('Carregando frase...')
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      frase!.texto,
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          fontStyle: FontStyle.italic),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '— ${frase!.autor}',
+                                      style: const TextStyle(
+                                          fontSize: 12, color: Colors.grey),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    const Text(
+                                      'Inspirational quotes provided by ZenQuotes API',
+                                      style: TextStyle(
+                                          fontSize: 10, color: Colors.grey),
+                                    ),
+                                  ],
+                                ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.refresh),
+                          tooltip: 'Nova frase',
+                          onPressed: carregandoFrase ? null : _carregarFrase,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
                 Container(
                   padding: const EdgeInsets.all(12),
                   color: Colors.black.withOpacity(0.25),
@@ -207,6 +271,7 @@ class _HomePageState extends State<HomePage> {
                                   );
                                   _carregarDados();
                                 },
+                                // MUDOU
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
